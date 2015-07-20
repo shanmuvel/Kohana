@@ -216,8 +216,21 @@ class Controller_Api_User extends Controller {
         $user_info->save();
     }
     
+    /**
+     * Get User Info
+     * @param type $data
+     * @return type as Array
+     */
     public static function get_user_info($data) {
-        
+        $user_info = ORM::factory('UserInfo')
+                ->select('cfm_users.email')
+                ->join('cfm_users', 'RIGHT OUTER')
+                ->on('user_id', '=', 'cfm_users.id')
+                ->where('cfm_users.id', '=', $data)
+                ->find()
+                ->as_array();
+
+        return $user_info;
     }
 
 }
