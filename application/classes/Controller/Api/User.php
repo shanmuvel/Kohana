@@ -26,14 +26,15 @@ class Controller_Api_User extends Controller {
         if ($login):
             // Get logged in user details
             $user = Auth::instance()->get_user();
+            $user_role = ORM::factory('RoleUser')->where("user_id", '=', $user->id)->find();
 
             // Check if user is active state
             if ($user->is_active == TRUE && $user->is_remove == FALSE):
-                $response = array("success" => true);
+                $response = array("success" => true, "user_id" => $user->id, "user_role" => $user_role->role_id);
             elseif ($user->is_active == FALSE && $user->is_remove == FALSE):
-                $response = array("success" => false, "message" => "Sorry your account is not yet activated.");
+                $response = array("success" => false, "message" => "Sorry your account is not activated.");
             else:
-                $response = array("success" => false, "message" => "Sorry your account was supended. Please contact our administrator.");
+                $response = array("success" => false, "message" => "Sorry your account has been suspended. Please contact our support team");
             endif;
 
         else:
@@ -63,8 +64,12 @@ class Controller_Api_User extends Controller {
             $signup->created_at = $date->format('Y-m-d H:i:s');
             $signup->updated_at = $date->format('Y-m-d H:i:s');
             $signup->save();
+            
+            // Grant user login role
+            $signup->add('roles', ORM::factory('Role', array('name' => 'agent')));
+                
             self::save_user_registration_code($signup->id, $email);
-            $response = array('success' => true, 'message' => "The agent '$email' was successfully registered");
+            $response = array('success' => true, 'message' => "The agent '$email' has been successfully registered");
         endif;
         
         return $response;
@@ -232,7 +237,23 @@ class Controller_Api_User extends Controller {
 
         return $user_info;
     }
-
+    
+    /**
+     * User Profile Activation
+     * @param type $data
+     * @return type as Array
+     */
+    public static function user_profile_activation($data) {
+        try {
+            $user = ORM::factory('User', $data['user_id']);
+            $user->is_active = 1;
+            $user->save();
+            $response = array('success' => true, 'message' => "Your Profile has been successfully activated");
+        } catch (ErrorException $ex) {
+            $response = array('success' => false, 'message' => "Sorry, Invalid Request or internal problem");
+        }
+        return $response;
+    }
 }
 
 ?>
