@@ -94,6 +94,36 @@ class Controller_Api_Agent extends Controller {
 
         return $client_list;
     }
+    
+    /**
+     * Get client financial payment info
+     * @param type $data
+     */
+    public static function get_client_financial_payment_info($data) {
+        
+        // Monthly Payments
+        $mp1 = Controller_Helper_Agent::get_g27();
+        $mp3 = Controller_Helper_Agent::get_g26();
+        $mp2 = $mp3-$mp1;
+        
+        // Years To Freedom
+        $yf1 = Controller_Helper_Agent::get_g41();
+        $yf3 = Controller_Helper_Agent::get_h41();
+        $yf2 = $yf3-$yf1;
+        
+        // Total Interest Cost
+        $tic1 = Controller_Helper_Agent::get_g35();
+        $tic3 = Controller_Helper_Agent::get_h35();
+        $tic2 = $tic3-$tic1;
+        
+        // Increased Monthly CashFlow
+        $imc = Controller_Helper_Agent::get_g28();
+        
+        //Lost Wealth by Giving into old schedule
+        $lws = $mp3*$yf2*12;
+        
+       // $response = array("monthly_payments" => array("mp1" => number))
+    }
 
 }
 

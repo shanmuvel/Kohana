@@ -12,7 +12,29 @@ class Controller_Agent extends Controller {
 
     public function action_index() {
         // Index Function
+        //$amount = $this->_pmt(0.002895623, 300, 441426);
+        
+        //$amount = -LN(1-B24*J24/G24)/LN(1+J24);
+        
+        //$amount = -log(1-441426*0.002895623/3233.15)/log(1+0.002895623);
+        
+        $amount = Controller_Helper_Agent::get_h35();
+        
+        $this->response->body($amount);
+        
     }
+    
+    public function _pmt($i, $n, $p) {
+//       $interest = $interest / 1200;
+//       $amount = $interest * -$loan * pow((1 + $interest), $months) / (1 - pow((1 + $interest), $months));
+//       return number_format($amount, 2);
+        
+      
+  $amount = $i * $p * pow((1 + $i), $n) / (1 - pow((1 + $i), $n));
+  return number_format($amount, 2);
+    }
+
+    
     
     /**
      * Add New Client Info
