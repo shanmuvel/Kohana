@@ -107,7 +107,7 @@ class Controller_Api_User extends Controller {
             'subject' => 'Welcome to KRCFM',
             'body' => $message,
             'from' => array('admin@myschedule.org' => 'KRCFM'),
-            'to' => "shanmu.grs24@gmail.com"
+            'to' => $email
         );
         
         Email::send('default', $mail['subject'], $mail['body'], $mail['from'], $mail['to'], 'text/html');
@@ -156,7 +156,7 @@ class Controller_Api_User extends Controller {
                 self::update_profile_info($data);
                 $response = array('success' => true, 'message' => "Profile was successfully updated");
             else:
-                self::create_profile_info($data);
+                self::create_profile_info($data, $user->email);
                 $response = array('success' => true, 'message' => "Success!! Profile was successfully created and activation link has been sent your mail.");
             endif;
         } catch (ErrorException $ex) {
@@ -170,7 +170,7 @@ class Controller_Api_User extends Controller {
      * Create New Profile Info
      * @param type $user_id
      */
-    public static function create_profile_info($data) {
+    public static function create_profile_info($data, $email) {
         $config_path = Kohana::$config->load('myconf');
         $date = new DateTime();
         $user_info = ORM::factory('UserInfo');
@@ -184,14 +184,14 @@ class Controller_Api_User extends Controller {
         $user_info->save();
         
         // Send profile activation email to user
-        self::send_profile_activation_email($config_path->profile_activation_url, $data['user_id'], $data['firstname']);
+        self::send_profile_activation_email($config_path->profile_activation_url, $data['user_id'], $data['firstname'], $email);
     }
     
      /**
      * Send Profile activation email to registered user
      * @param type $email
      */
-    public static function send_profile_activation_email($url, $user_id, $name) {
+    public static function send_profile_activation_email($url, $user_id, $name, $email) {
         $message = View::factory('template/mail/profile_activation')
                 ->bind('name', $name)
                 ->bind('user_id', $user_id)
@@ -200,7 +200,7 @@ class Controller_Api_User extends Controller {
             'subject' => 'KRCFM-Profile Activation',
             'body' => $message,
             'from' => array('admin@myschedule.org' => 'KRCFM'),
-            'to' => "shanmu.grs24@gmail.com"
+            'to' => $email
         );
 
         Email::send('default', $mail['subject'], $mail['body'], $mail['from'], $mail['to'], 'text/html');

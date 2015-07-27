@@ -33,7 +33,7 @@ class Controller_Api_Agent extends Controller {
             // Save Financial Info
             self::save_financial_info($data, $client->id);
             
-            $response = array('success' => true, 'message' => "Client Info Successfully Saved"); 
+            $response = array('success' => true, 'message' => "Client Info Successfully Saved", 'id' => $client->id); 
             
         } catch (ErrorException $ex) {
             $response = array('success' => false, 'message' => "Failed! Internal Problem!!");
@@ -96,10 +96,64 @@ class Controller_Api_Agent extends Controller {
     }
     
     /**
+     * Create Agent's Pre-Qualification form
+     * @param type $data
+     * @return type $response as Array
+     */
+    public static function create_prequalification_info($data) {
+        try {
+            $date = new DateTime();
+            $pre_qualification_info = ORM::factory('PreQualificationInfo');
+            $pre_qualification = $pre_qualification_info->where('user_id', '=', $data['user_id'])->count_all();
+            if ($pre_qualification > 0):
+                // Update 
+                $pre_qualification_info = $pre_qualification_info->where('user_id', '=', $data['user_id'])->find();
+            endif;
+            $pre_qualification_info->user_id = $data['user_id'];
+            $pre_qualification_info->mortgage_balance = $data['mortgage_balance'];
+            $pre_qualification_info->short_term_debts = $data['short_term_debts'];
+            $pre_qualification_info->market_value = $data['market_value'];
+            if ($pre_qualification <= 0):
+                $pre_qualification_info->created_at = $date->format('Y-m-d H:i:s');
+            endif;
+            $pre_qualification_info->updated_at = $date->format('Y-m-d H:i:s');
+            $pre_qualification_info->save();
+
+            $response = array('success' => true, 'message' => "Pre-qualification form successfully submitted");
+        } catch (ErrorException $ex) {
+            $response = array('success' => false, 'message' => "Failed! Internal Problem!!");
+        }
+
+        return $response;
+    }
+    
+    /**
+     * Check if is it prequalifier
+     * @param type $data
+     * @return $response as array
+     */
+    public static function check_is_prequalifier($data) {
+        $prequalifier = ORM::factory('PreQualificationInfo')->where('user_id', '=', $data['user_id'])->count_all();
+        if ($prequalifier > 0):
+            $response = array('success' => true);
+        else:
+            $response = array('success' => false);
+        endif;
+
+        return $response;
+    }
+
+    /**
      * Get client financial payment info
      * @param type $data
      */
     public static function get_client_financial_payment_info($data) {
+        
+        session_start();
+        $_SESSION['id'] = $data['client_id'];
+        
+        // Client Info
+        $client_info = ORM::factory('ClientPersonalInfo', $data['client_id'])->as_array();
         
         // Monthly Payments
         $mp1 = Controller_Helper_Agent::get_g27();
@@ -122,7 +176,31 @@ class Controller_Api_Agent extends Controller {
         //Lost Wealth by Giving into old schedule
         $lws = $mp3*$yf2*12;
         
-       // $response = array("monthly_payments" => array("mp1" => number))
+        
+        $response = array(
+            "client_info" => $client_info,
+            
+            "monthly_payments" => array(
+                "mp1" => round($mp1),
+                "mp2" => round($mp2),
+                "mp3" => round($mp3)
+            ),
+            "years_to_freedom" => array(
+                "yf1" => number_format($yf1, 1),
+                "yf2" => number_format($yf2, 1),
+                "yf3" => number_format($yf3, 1)
+            ),
+            "total_interest_cost" => array(
+                "tic1" => round($tic1),
+                "tic2" => round($tic2),
+                "tic3" => round($tic3)
+            ),
+            "imc" => round($imc),
+            "lws" => round($lws)
+        );
+        
+        return $response;
+        session_destroy();
     }
 
 }

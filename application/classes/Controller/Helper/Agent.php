@@ -79,11 +79,15 @@ class Controller_Helper_Agent extends Controller {
     }
     
     public static function get_b9() {
-        return $b9 = 342287;
+        $config = Kohana::$config->load('myconf');
+        $client_info = self::get_financial_data($config->client_finance_type["type1"]);
+        return $b9 = $client_info->dept_amount;
     }
     
     public static function get_b10() {
-        return $b10 = 0;
+        $config = Kohana::$config->load('myconf');
+        $client_info = self::get_financial_data($config->client_finance_type["type2"]);
+        return $b10 = $client_info->dept_amount;
     }
     
     public static function get_b21() {
@@ -95,15 +99,21 @@ class Controller_Helper_Agent extends Controller {
     }
 
     public static function get_b13() {
-        return $b13 = 85000;
+        $config = Kohana::$config->load('myconf');
+        $client_info = self::get_financial_data($config->client_finance_type["type3"]);
+        return $b13 = $client_info->dept_amount;
     }
     
     public static function get_g9() {
-        return $g9 = 1713;
+        $config = Kohana::$config->load('myconf');
+        $client_info = self::get_financial_data($config->client_finance_type["type1"]);
+        return $g9 = $client_info->monthly_payment;
     }
     
     public static function get_g10() {
-        return $g10 = 0;
+        $config = Kohana::$config->load('myconf');
+        $client_info = self::get_financial_data($config->client_finance_type["type2"]);
+        return $g10 = $client_info->monthly_payment;
     }
     
     public static function get_g11() {
@@ -114,7 +124,9 @@ class Controller_Helper_Agent extends Controller {
     }
     
     public static function get_g13() {
-        return $g13 = 2550;
+        $config = Kohana::$config->load('myconf');
+        $client_info = self::get_financial_data($config->client_finance_type["type3"]);
+        return $g13 = $client_info->monthly_payment;
     }
 
     public static function get_g21() {
@@ -272,15 +284,21 @@ class Controller_Helper_Agent extends Controller {
     }
 
     public static function get_c9() {
-        return $c9 = 3.50/100; // Rate of interest 3.50%
+        $config = Kohana::$config->load('myconf');
+        $client_info = self::get_financial_data($config->client_finance_type["type1"]);
+        return $c9 = $client_info->interest_rate/100; // Rate of interest 3.50%
     }
     
     public static function get_c10() {
-        return $c10 = 10.00/100; // Rate of interest 10.00%
+        $config = Kohana::$config->load('myconf');
+        $client_info = self::get_financial_data($config->client_finance_type["type2"]);
+        return $c10 = $client_info->interest_rate/100; // Rate of interest 10.00%
     }
     
     public static function get_c13() {
-        return $c13 = 17.00/100; // Rate of interest 17.00%
+        $config = Kohana::$config->load('myconf');
+        $client_info = self::get_financial_data($config->client_finance_type["type3"]);
+        return $c13 = $client_info->interest_rate/100; // Rate of interest 17.00%
     }
 
     public static function get_c24() {
@@ -326,6 +344,16 @@ class Controller_Helper_Agent extends Controller {
     public static function pmt($i, $n, $p) {
         $amount = -($i * $p * pow((1 + $i), $n) / (1 - pow((1 + $i), $n)));
         return $amount;
+    }
+    
+    public static function get_financial_data($type) {
+        $client_id = $_SESSION['id'];
+        $financial_data = ORM::factory('ClientFinancialInfo')
+                ->where('client_id', '=', $client_id)
+                ->and_where('finance_type', '=', $type)
+                ->find();
+
+        return $financial_data;
     }
 
 }
