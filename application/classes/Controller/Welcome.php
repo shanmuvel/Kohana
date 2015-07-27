@@ -2,22 +2,43 @@
 
 defined('SYSPATH') or die('No direct script access.');
 
-class Controller_Welcome extends Controller {
+class Controller_Welcome extends Controller_Template {
 
     public $template = 'site';
 
     public function action_index() {
 
         // Load the user information
-        $user = Auth::instance()->get_user();
+      //  $user = Auth::instance()->get_user();
 
-        $this->template->content = View::factory('welcome/info')
-                ->bind('user', $user);
+        $this->template->content = View::factory('welcome/info');
+              //  ->bind('user', $user);
 
         // if a user is not logged in, redirect to login page
-        if (!$user) {
-            $this->redirect('welcome/login');
-        }
+//        if (!$user) {
+//            $this->redirect('welcome/login');
+//        }
+    }
+    
+    public function action_send_email() {
+        
+        $email = "shan@gmail.com";
+        $code = "ASDF123";
+        $user_id = 10;
+        $url = "http://www.google.com";
+          $message = View::factory('template/mail/signup')
+                ->bind('email', $email)
+                ->bind('registration_code', $code)
+                ->bind('user_id', $user_id)
+                ->bind('url', $url);
+        $mail = array(
+            'subject' => 'Welcome to KRCFM',
+            'body' => $message,
+            'from' => array('info@my-schedule.net' => 'KRCFM'),
+            'to' => "shanmu.grs24@gmail.com"
+        );
+        
+        Email::send('default', $mail['subject'], $mail['body'], $mail['from'], $mail['to'], 'text/html');
     }
 
     public function action_create() {
