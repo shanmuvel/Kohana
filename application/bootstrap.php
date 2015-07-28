@@ -130,6 +130,7 @@ Kohana::modules(array(
          'flexiblemigrations' => MODPATH.'flexiblemigrations',
 	 'orm'        => MODPATH.'orm',        // Object Relationship Mapping
          'email'      => MODPATH.'kohana-email-master', // Email module
+         'pdf'      => MODPATH.'kohana-pdf-master', // Email module
 	// 'unittest'   => MODPATH.'unittest',   // Unit testing
 	// 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
 	));

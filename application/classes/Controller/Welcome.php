@@ -10,9 +10,20 @@ class Controller_Welcome extends Controller_Template {
 
         // Load the user information
       //  $user = Auth::instance()->get_user();
+         $config = array(
+                'author'   => 'Shanmugan',
+                'title'    => 'Test',
+                'subject'  => 'Pdf',
+                'name'     => Text::random().'.pdf', // name file pdf
+        );
+        
+        $name = "Shan";
+        View_PDF::factory('welcome/info', $config)
+                ->set("name", $name)
+        ->render();
 
-        $this->template->content = View::factory('welcome/info');
-              //  ->bind('user', $user);
+        $this->template->content = View::factory('welcome/info')
+                ->bind('name', $name);
 
         // if a user is not logged in, redirect to login page
 //        if (!$user) {
