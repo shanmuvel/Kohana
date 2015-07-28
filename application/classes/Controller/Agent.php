@@ -16,7 +16,7 @@ class Controller_Agent extends Controller {
         //$amount = Controller_Helper_Agent::get_h35();
        // session_start();
      //   $_SESSION['id'] = "1";
-        $this->response->body(Controller_Helper_Agent::get_b9());
+        $this->response->body(Controller_Helper_Agent::get_i9());
        // session_destroy();
         
         

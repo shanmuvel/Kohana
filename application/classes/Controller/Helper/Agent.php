@@ -50,13 +50,18 @@ class Controller_Helper_Agent extends Controller {
         $l21 = self::get_l21();
         $h35 = $l11+$l21;
         return round($h35);
-    } 
+    }
+    
+    public static function get_h36() {
+        $h36 = self::get_k22();
+        return $h36;
+    }
 
     public static function get_number_of_payments() {
         $d24 = self::get_d24();
-        return $d24*12;
+        return $d24 * 12;
     }
-    
+
     public static function get_b24() {
         $b22 = self::get_b22();
         $g11 = self::get_g11();
@@ -78,6 +83,10 @@ class Controller_Helper_Agent extends Controller {
         return $b11;
     }
     
+    public static function get_b4() {
+        return $b4 = "4/7/2015"; // Default value
+    }
+
     public static function get_b9() {
         $config = Kohana::$config->load('myconf');
         $client_info = self::get_financial_data($config->client_finance_type["type1"]);
@@ -133,6 +142,13 @@ class Controller_Helper_Agent extends Controller {
         return $g21 = self::get_g13();
     }
     
+    public static function get_g22() {
+        $g11 = self::get_g11();
+        $g21 = self::get_g21();
+        $g22 = $g11+$g21;
+        return $g22;
+    }
+
     public static function get_g24() {
         $g27 = self::get_g27();
         $g29 = self::get_g29();
@@ -201,6 +217,42 @@ class Controller_Helper_Agent extends Controller {
         return $h24;
     }
     
+    public static function get_i9() {
+        $h9 = self::get_h9();
+        $b4 = self::get_b4();
+        if($h9>0):
+            $nd = $h9/12*365;
+            $days = round($nd);
+            $dt = new DateTime($b4);
+            $dt->add(DateInterval::createFromDateString("+$days day"));
+            $i9 = $dt->format('M Y');
+        else:
+            $i9 = "";
+        endif;      
+        
+        return $i9;
+    }
+    
+    public static function get_i35() {
+        return self::get_h35()-self::get_g35();
+    }
+    
+    public static function get_h37() {
+        return self::get_g22();
+    }
+    
+    public static function get_h38() {
+        return self::get_g29();
+    }
+
+    public static function get_h40() {
+        return self::get_h37()+self::get_h38();
+    }
+
+    public static function get_i41() {
+        return self::get_h41()-self::get_g41();
+    }
+
     public static function get_j9() {
         $c9 = self::get_c9();
         $f9 = self::get_f9();
@@ -240,47 +292,56 @@ class Controller_Helper_Agent extends Controller {
         return number_format($j24, 10);
     }
     
+    public static function get_k9() {
+        return self::get_g9()*self::get_h9();
+    }
+    
+    public static function get_k10() {
+        return self::get_g10()*self::get_h10();
+    }
+
+    public static function get_k11() {
+        return self::get_k9()+self::get_k10();
+    }
+    
+    public static function get_k13() {
+        return self::get_g13()*self::get_h13();
+    }
+
+    public static function get_k21() {
+        return self::get_k13();
+    }
+
+    public static function get_k22() {
+        return self::get_k11()+self::get_k21();
+    }
+
     public static function get_k24() {
-        $g24 = self::get_g24();
-        $h24 = self::get_h24();
-        $k24 = $g24*$h24;
-        return $k24;
+        return self::get_g24()*self::get_h24();
     }
     
     public static function get_l9() {
-        $g9 = self::get_g9();
-        $h9 = self::get_h9();
-        $b9 = self::get_b9();
-        $l9 = $g9*$h9-$b9;
-        return $l9;
+        return self::get_g9()*self::get_h9()-self::get_b9();
     }
     
     public static function get_l10() {
-        $g10 = self::get_g10();
-        $h10 = self::get_h10();
-        $b10 = self::get_b10();
-        $l10 = $g10*$h10-$b10;
-        return $l10;
+        return self::get_g10()*self::get_h10()-self::get_b10();
     }
 
     public static function get_l11() {
-        $l9 = self::get_l9();
-        $l10 = self::get_l10();
-        $l11 = $l9+$l10;
-        return $l11;
+        return self::get_l9()+self::get_l10();
     }
     
     public static function get_l13() {
-        $g13 = self::get_g13();
-        $h13 = self::get_h13();
-        $b13 = self::get_b13();
-        $l13 = $g13*$h13-$b13;
-        return $l13;
+        return self::get_g13()*self::get_h13()-self::get_b13();
     }
 
     public static function get_l21() {
-        $l13 = self::get_l13();
-        return $l21 = $l13;
+        return self::get_l13();
+    }
+    
+    public static function get_l22() {
+        return self::get_l11()+self::get_l21();
     }
 
     public static function get_c9() {
@@ -348,6 +409,7 @@ class Controller_Helper_Agent extends Controller {
     
     public static function get_financial_data($type) {
         $client_id = $_SESSION['id'];
+        //$client_id = 5;
         $financial_data = ORM::factory('ClientFinancialInfo')
                 ->where('client_id', '=', $client_id)
                 ->and_where('finance_type', '=', $type)
