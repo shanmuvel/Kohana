@@ -56,10 +56,10 @@ class Controller_Api_Agent extends Controller {
                 $client_financial_info = ORM::factory('ClientFinancialInfo');
                 $client_financial_info->client_id = $client_id;
                 $client_financial_info->finance_type = $info['finance_type'];
-                $client_financial_info->dept_description = $info['dept_description'];
-                $client_financial_info->dept_amount = $info['dept_amount'];
+                $client_financial_info->dept_description = $info['debt_description'];
+                $client_financial_info->dept_amount = $info['debt_amount'];
                 $client_financial_info->interest_rate = $info['interest_rate'];
-                $client_financial_info->amount_period = $info['amount_period'];
+                $client_financial_info->amount_period = $info['amort_period'];
                 $client_financial_info->monthly_payment = $info['monthly_payment'];
                 $client_financial_info->created_at = $date->format('Y-m-d H:i:s');
                 $client_financial_info->updated_at = $date->format('Y-m-d H:i:s');
@@ -133,9 +133,9 @@ class Controller_Api_Agent extends Controller {
      * @return $response as array
      */
     public static function check_is_prequalifier($data) {
-        $prequalifier = ORM::factory('PreQualificationInfo')->where('user_id', '=', $data['user_id'])->count_all();
-        if ($prequalifier > 0):
-            $response = array('success' => true);
+        $prequalifier = ORM::factory('PreQualificationInfo')->where('user_id', '=', $data['user_id'])->find();
+        if ($prequalifier != NULL):
+            $response = array('success' => true, 'data' => $prequalifier->as_array());
         else:
             $response = array('success' => false);
         endif;

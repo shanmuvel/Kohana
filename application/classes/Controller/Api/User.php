@@ -123,11 +123,12 @@ class Controller_Api_User extends Controller {
         try {
             $user_registration_code = ORM::factory('UserRegistrationCode')
                     ->where("user_id", "=", $data['user_id'])
-                    ->and_where("registration_code", "=", $data["code"])
                     ->find();
 
-            if ($user_registration_code != NULL):
-                $user_registration_code->delete();
+            if ($user_registration_code != NULL && $user_registration_code->registration_code == trim($data["code"])):
+                $user_registration_code->is_verified = 1;
+                $user_registration_code->save();
+                
                 $response = array('success' => true, 'message' => "Success");
             else:
                 $response = array('success' => false, 'message' => "Invalid Code");
@@ -251,6 +252,31 @@ class Controller_Api_User extends Controller {
             $response = array('success' => true, 'message' => "Your Profile has been successfully activated");
         } catch (ErrorException $ex) {
             $response = array('success' => false, 'message' => "Sorry, Invalid Request or internal problem");
+        }
+        return $response;
+    }
+    
+    /**
+     * Resend User Registration Code
+     * @param type $data
+     * @return type as Array
+     */
+    public static function resend_user_registration_code($data) {
+        try {
+            $config_path = Kohana::$config->load('myconf');
+            $user_code = ORM::factory('UserRegistrationCode')
+                    ->where("user_id", "=", $data['user_id'])
+                    ->find();
+            if ($user_code != NULL) {
+                // Send registration code to user through the email
+                self::send_signup_email($data['email'], $user_code->registration_code, $config_path->code_verification_url, $data['user_id']);
+            } else {
+                // Create New registration code and send it to the user.
+                self::save_user_registration_code($data['user_id'], $data['email']);
+            }
+            $response = array('success' => true, 'message' => "Registration code has been successfully sent to the agent");
+        } catch (ErrorException $ex) {
+            $response = array('success' => false, 'message' => "Failed!! Code is not sent");
         }
         return $response;
     }

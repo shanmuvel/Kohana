@@ -38,6 +38,7 @@ class Controller_Api_Admin extends Controller {
             $agent_info['email'] = $agent->email;
             $agent_info['is_active'] = (bool) $agent->is_active;
             $agent_info['is_remove'] = (bool) $agent->is_remove;
+            $agent_info['clients'] = ORM::factory('ClientPersonalInfo')->where('user_id', '=', $agent->id)->count_all();
             $agent_list[] = $agent_info;
         endforeach;
 
