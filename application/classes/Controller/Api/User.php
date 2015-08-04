@@ -229,7 +229,7 @@ class Controller_Api_User extends Controller {
      */
     public static function get_user_info($data) {
         $user_info = ORM::factory('UserInfo')
-                ->select('cfm_users.email')
+                ->select('cfm_users.email', 'cfm_users.last_login', 'cfm_users.created_at', 'cfm_users.updated_at')
                 ->join('cfm_users', 'RIGHT OUTER')
                 ->on('user_id', '=', 'cfm_users.id')
                 ->where('cfm_users.id', '=', $data)

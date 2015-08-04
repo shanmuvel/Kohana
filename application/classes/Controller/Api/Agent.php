@@ -222,6 +222,33 @@ class Controller_Api_Agent extends Controller {
         return $response;
         session_destroy();
     }
+    
+    
+    /**
+     * Get User Profile Info
+     * @param type $data
+     * @return type as Array
+     */
+    public static function get_profile_info($data) {
+        try {
+            $user_info = ORM::factory('UserInfo')
+                    ->select('cfm_users.email', 'cfm_users.is_active', 'cfm_users.last_login', DB::expr('cfm_users.created_at AS profile_created_at'), DB::expr('cfm_users.updated_at AS profile_activated_at'), 'cfm_pre_qualification.*', DB::expr('count(cfm_client_personal_info.user_id) AS clients_count'))
+                    ->join('cfm_users', 'RIGHT OUTER')
+                    ->on('user_id', '=', 'cfm_users.id')
+                    ->join('cfm_pre_qualification', 'RiGHT OUTER')
+                    ->on('cfm_pre_qualification.user_id', '=', 'cfm_users.id')
+                    ->join('cfm_client_personal_info', 'RiGHT OUTER')
+                    ->on('cfm_client_personal_info.user_id', '=', 'cfm_users.id')
+                    ->where('cfm_users.id', '=', $data)
+                    ->find()
+                    ->as_array();
+            $user_info['last_login'] = Date::fuzzy_span($user_info['last_login']);
+
+            return array('success' => true, "user_info" => $user_info);
+        } catch (ErrorException $ex) {
+            return array('success' => false, "message" => "Internal sever problem");
+        }
+    }
 
 }
 

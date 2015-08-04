@@ -87,6 +87,9 @@ class Controller_Agent extends Controller {
         $this->auto_render = FALSE;
     }
     
+    /**
+     * Get Client's Snapshot Info 
+     */
     public function action_get_snapshot_data() {
         // API headers
         Controller_Helper_Header::api_headers($this->response);
@@ -99,6 +102,22 @@ class Controller_Agent extends Controller {
         }
         $this->auto_render = FALSE;
     }
+    
+    /**
+     * Get User Profile Info
+     */
+    public function action_profile_info() {
+         // API headers
+        Controller_Helper_Header::api_headers($this->response);
+        if (HTTP_Request::POST == $this->request->method()) {
+            $data = json_decode(file_get_contents('php://input'), TRUE);
+            $response = Controller_Api_Agent::get_profile_info($data);
+            $this->response->headers('Content-Type', 'application/json');
+
+            echo json_encode($response);
+        }
+        $this->auto_render = FALSE;
+    } 
 
 }
 
